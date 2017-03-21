@@ -3,8 +3,6 @@
 
 #include <iostream>
 
-static const std::string CSI = "\x1b[";
-
 // The Terminal class abstracts away things we want to do with the terminal
 // It is a singleton, and 
 class Terminal {
@@ -15,9 +13,7 @@ public:
         LeftDir,
         RightDir
     };
-    void moveCursor(Dir dir, int n);
-    void setCursor(int row, int col);
-    void showCursor(bool b);
+    void drawMode(bool on);
 
     enum Color {
         Black = 0,
@@ -34,7 +30,6 @@ public:
     void colorBg(Color color);
     void colorAll(bool bright, Color foreColor, Color backColor);
     void setNegative(bool set);
-    void setDefault();
 
     void clearScreen();
 
@@ -47,16 +42,20 @@ public:
         ErrorCode
     };
     std::pair<Code, char> readChar();
-    void resetRead();
-
-    ~Terminal();
 
     static Terminal& getTerm();
+
+    ~Terminal();
     Terminal(const Terminal&) = delete;
 
 private:
     Terminal();
     static Terminal* g_terminal;
+
+    void moveCursor(Dir dir, int n);
+    void setCursor(int row, int col);
+    void showCursor(bool b);
+    void setDefault();
 };
 
 #endif

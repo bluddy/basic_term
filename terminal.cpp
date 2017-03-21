@@ -4,6 +4,8 @@
 #include <signal.h>
 #include "terminal.h"
 
+static const std::string CSI = "\x1b[";
+
 Terminal* Terminal::g_terminal = NULL;
 
 // Save the termios status
@@ -28,6 +30,17 @@ void undoRawInput() {
         tcsetattr(0, TCSANOW, &savedTermios);
     }
     rawInput = false;
+}
+
+void Terminal::drawMode(bool on) {
+    if (on) {
+        showCursor(false);
+        setupRawInput();
+    } else {
+        showCursor(true);
+        setDefault();
+        undoRawInput();
+    }
 }
 
 Terminal& Terminal::getTerm() {
@@ -81,6 +94,7 @@ void Terminal::setDefault() {
 
 void Terminal::clearScreen() {
     std::cout << CSI << "2J";
+    setCursor(1,1);
 }
 
 std::pair<Terminal::Code, char> Terminal::readChar() {
@@ -105,10 +119,6 @@ std::pair<Terminal::Code, char> Terminal::readChar() {
         c = (char)result;
     }
     return {cd, c};
-}
-
-void Terminal::resetRead() {
-    undoRawInput();
 }
 
 void restore_defaults() {
