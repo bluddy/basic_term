@@ -55,7 +55,7 @@ public:
     Terminal(const Terminal&) = delete;
 
 private:
-    Terminal() {}
+    Terminal();
     static Terminal* g_terminal;
 };
 
