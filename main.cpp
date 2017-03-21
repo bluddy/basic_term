@@ -35,18 +35,19 @@ int main() {
     char arr[3][4] = {"X O", "OXO", "X  "};
     int cursor[2] = {1,1};
     drawBoard(cursor, arr);
-
     Terminal& t = Terminal::getTerm();
+
     while (true) {
         auto p = t.readChar();
-        switch (p.second) {
-            case 'j': case 'k': case 'h': case 'l':
-                if (p.second == 'j' && cursor[0] < 3) cursor[0]++;
-                else if (p.second == 'k' && cursor[0] > 1) cursor[0]--;
-                else if (p.second == 'h' && cursor[1] > 1) cursor[1]--;
-                else if (p.second == 'l' && cursor[1] < 3) cursor[1]++;
-                drawBoard(cursor, arr);
-        }
+        if ((p.first == Terminal::DownCode || p.second == 'j') &&
+                cursor[0] < 3) cursor[0]++;
+        else if ((p.first == Terminal::UpCode || p.second == 'k') &&
+                cursor[0] > 1) cursor[0]--;
+        else if ((p.first == Terminal::LeftCode || p.second == 'h') &&
+                cursor[1] > 1) cursor[1]--;
+        else if ((p.first == Terminal::RightCode || p.second == 'l') &&
+                cursor[1] < 3) cursor[1]++;
+        drawBoard(cursor, arr);
     }
     t.resetRead();
 }

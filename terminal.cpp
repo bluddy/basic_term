@@ -87,8 +87,23 @@ std::pair<Terminal::Code, char> Terminal::readChar() {
     if (!rawInput) setupRawInput();
     int result;
     read(0, &result, 1);
-    Code cd = result == -1 ? ErrorCode : CharCode;
-    char c = result == -1 ? 0 : (char)result;
+    Code cd;
+    char c = 0;
+    if (result == -1) cd = ErrorCode;
+    else if ((char)result == 0x1b) {
+        // extended code
+        char cc[5] = {0};
+        read(0, cc, 2);
+        if (cc[0] == '[') {
+            if (cc[1] == 'A') cd = UpCode;
+            else if (cc[1] == 'B') cd = DownCode;
+            else if (cc[1] == 'C') cd = RightCode;
+            else if (cc[1] == 'D') cd = LeftCode;
+        }
+    } else {
+        cd = CharCode;
+        c = (char)result;
+    }
     return {cd, c};
 }
 
