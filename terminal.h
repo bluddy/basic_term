@@ -12,19 +12,13 @@ public:
     class Cursor {
     public:
         enum Dir {
-            Up,
-            Down,
-            Left,
-            Right
+            UpDir,
+            DownDir,
+            LeftDir,
+            RightDir
         };
-        void move(Dir dir, int n) {
-            char c = (dir == Up) ? 'A' : (dir == Down) ? 'B' :
-                         (dir == Right) ? 'C' : (dir == Left) ? 'D' : 0;
-            if (c) std::cout << CSI << n << c;
-        }
-        void set(int row, int col) {
-            std::cout << CSI << row << ';' << col << 'H';
-        }
+        void move(Dir dir, int n);
+        void set(int row, int col);
     };
     enum Color {
         Black = 0,
@@ -37,24 +31,25 @@ public:
         White,
         Default = 9
     };
-    void setColorFore(bool bright, Color color) {
-        std::cout << CSI << 30 + color << (bright ? ";1" : "") << "m";
-    }
-    void setColorBack(Color color) {
-        std::cout << CSI << 40 + color << "m";
-    }
-    void setColorAll(bool bright, Color foreColor, Color backColor) {
-        std::cout << CSI << 30 + foreColor << (bright ? ";1;" : ";") << 40 + backColor << "m";
-    }
-    void setNegative(bool set) {
-        std::cout << CSI << (set ? "7m" : "27m");
-    }
-    void setDefault() {
-        std::cout << CSI << "0m";
-    }
-    void clearScreen() {
-        std::cout << CSI << "2J";
-    }
+    void colorFg(bool bright, Color color);
+    void colorBg(Color color);
+    void colorAll(bool bright, Color foreColor, Color backColor);
+    void setNegative(bool set);
+    void setDefault();
+
+    void clearScreen();
+
+    enum Code {
+        CharCode,
+        UpCode,
+        DownCode,
+        LeftCode,
+        RightCode,
+        ErrorCode
+    };
+    std::pair<Code, char> readChar();
+    void resetRead();
+
     ~Terminal() {
         setDefault();
         clearScreen();
@@ -64,8 +59,8 @@ public:
     Terminal(const Terminal&) = delete;
 
 private:
-    static Terminal* g_terminal;
     Terminal() {}
+    static Terminal* g_terminal;
 };
 
 #endif
