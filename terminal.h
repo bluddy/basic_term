@@ -9,17 +9,16 @@ static const std::string CSI = "\x1b[";
 // It is a singleton, and 
 class Terminal {
 public:
-    class Cursor {
-    public:
-        enum Dir {
-            UpDir,
-            DownDir,
-            LeftDir,
-            RightDir
-        };
-        void move(Dir dir, int n);
-        void set(int row, int col);
+    enum Dir {
+        UpDir,
+        DownDir,
+        LeftDir,
+        RightDir
     };
+    void moveCursor(Dir dir, int n);
+    void setCursor(int row, int col);
+    void showCursor(bool b);
+
     enum Color {
         Black = 0,
         Red,
@@ -50,12 +49,9 @@ public:
     std::pair<Code, char> readChar();
     void resetRead();
 
-    ~Terminal() {
-        setDefault();
-        clearScreen();
-    }
+    ~Terminal();
 
-    Terminal& getTerm();
+    static Terminal& getTerm();
     Terminal(const Terminal&) = delete;
 
 private:

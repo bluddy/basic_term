@@ -11,20 +11,20 @@ static bool rawInput = false;
 
 void setupRawInput() {
     if (!rawInput) {
-        tcgetattr(stdin, &savedTermios);
+        tcgetattr(0, &savedTermios);
         struct termios termios = savedTermios;
         termios.c_lflag &= ~ICANON;
         termios.c_lflag &= ~ECHO;
         termios.c_cc[VMIN] = 1;
         termios.c_cc[VTIME] = 0;
-        tcsetattr(stdin, TCSANOW, &termios);
+        tcsetattr(0, TCSANOW, &termios);
     }
     rawInput = true;
 }
 
 void undoRawInput() {
     if (rawInput) {
-        tcsetattr(stdin, TCSANOW, &savedTermios);
+        tcsetattr(0, TCSANOW, &savedTermios);
     }
     rawInput = false;
 }
@@ -36,14 +36,18 @@ Terminal& Terminal::getTerm() {
     return *g_terminal;
 }
 
-void Terminal::Cursor::move(Dir dir, int n) {
+void Terminal::moveCursor(Dir dir, int n) {
     char c = (dir == UpDir) ? 'A' : (dir == DownDir) ? 'B' :
                  (dir == RightDir) ? 'C' : (dir == LeftDir) ? 'D' : 0;
     if (c) std::cout << CSI << n << c;
 }
 
-void Terminal::Cursor::set(int row, int col) {
+void Terminal::setCursor(int row, int col) {
     std::cout << CSI << row << ';' << col << 'H';
+}
+
+void Terminal::showCursor(bool b) {
+    std::cout << CSI << "?25" << (b ? 'h' : 'l');
 }
 
 void Terminal::colorFg(bool bright, Color color) {
@@ -82,3 +86,9 @@ std::pair<Terminal::Code, char> Terminal::readChar() {
 void Terminal::resetRead() {
     undoRawInput();
 }
+
+Terminal::~Terminal() {
+    setDefault();
+    undoRawInput();
+}
+
